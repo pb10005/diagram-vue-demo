@@ -13,6 +13,7 @@
             v-model="val"
           ></v-text-field>
           <v-btn @click="add">ADD NODE</v-btn>
+          <v-btn @click="search">Search</v-btn>
           <v-btn @click="clear">CLEAR TREE</v-btn>
           <v-btn @click="exportSVG">EXPORT SVG</v-btn>
         </v-form>
@@ -60,6 +61,17 @@ export default {
   },
   mounted() {
     this.id = 0;
+    this.push(10);
+    this.push(2);
+    this.push(20);
+    this.push(6);
+    this.push(4);
+    this.push(8);
+    this.push(5);
+    this.push(13);
+    this.push(18);
+    this.push(23);
+
     this.updateView();
   },
   methods: {
@@ -73,12 +85,23 @@ export default {
         this.tree.root.add(new TreeNode(value));
       }
     },
+    search() {
+      this.clearSearchResult();
+      if (this.tree.root !== null) {
+        const result = this.tree.root.search(parseInt(this.val, 10));
+        this.updateView();
+        alert(result ? "Found" : "Not found");
+      }
+    },
+    clearSearchResult() {
+      this.tree.root.clearMarked();
+    },
     render(x, y, width, node) {
       if (node === null) return -1;
       const currentId = ++this.id;
       this.graph.nodes.push({
         id: currentId,
-        content: { text: node.value, color: "white" },
+        content: { text: node.value, color: node.marked ? "pink" : "white" },
         point: { x, y },
         width: 50,
         height: 50,
