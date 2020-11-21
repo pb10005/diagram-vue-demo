@@ -17,11 +17,8 @@
           <v-btn @click="clear">CLEAR TREE</v-btn>
           <v-btn @click="exportSVG">EXPORT SVG</v-btn>
         </v-form>
-        <section
-          class="pa-2 d-flex auto-scroll justify-center"
-          width="100%"
-          height="100%"
-        >
+        <section class="pa-2 d-flex justify-center">
+          <section class="auto-scroll">
           <Diagram
             ref="tree"
             :width="graph.width"
@@ -30,6 +27,7 @@
             :nodes="graph.nodes"
             :links="graph.links"
           />
+          </section>
         </section>
       </v-card-text>
     </v-card>
@@ -168,6 +166,6 @@ export default {
 </script>
 <style>
 .auto-scroll {
-  overflow: auto;
+  overflow: scroll;
 }
 </style>
