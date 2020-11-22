@@ -10,16 +10,32 @@ export default class TreeNode {
     this.marked = false;
   }
 
+  setLeftChild(node) {
+    this.leftChild = node;
+    if (node !== null)
+      node.onDelete = () => {
+        this.leftChild = null;
+      };
+  }
+
+  setRightChild(node) {
+    this.rightChild = node;
+    if (node !== null)
+      node.onDelete = () => {
+        this.rightChild = null;
+      };
+  }
+
   add(node) {
     if (node.value < this.value) {
       if (this.leftChild === null) {
-        this.leftChild = node;
+        this.setLeftChild(node);
       } else {
         this.leftChild.add(node);
       }
     } else {
       if (this.rightChild === null) {
-        this.rightChild = node;
+        this.setRightChild(node);
       } else {
         this.rightChild.add(node);
       }

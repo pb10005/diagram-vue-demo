@@ -2,7 +2,11 @@ import Nullable from "~/lib/Nullable";
 
 export default class BinarySearchTree {
   constructor(root) {
-    this.root = root;
+    this.setRoot(root);
+  }
+  setRoot(node) {
+    this.root = node;
+    if (node !== null) node.onDelete = () => {};
   }
   clear() {
     this.root = null;
@@ -17,27 +21,39 @@ export default class BinarySearchTree {
   findNode(value) {
     return Nullable.of(this.root)
       .map((x) => x.search(value))
-      .returnOr(false);
+      .returnOr(null);
   }
-  removeNode(node) {
-    if (node.leftChild !== null && node.rightChild !== null) {
-      // if node has 2 childs
-      let next = this.inOrder(node.rightChild)[0];
-      const tmp = node.value;
-      node.value = next.value;
-      next.value = tmp;
-      this.removeNode(next);
-    } else if (node.leftChild !== null) {
-      // if node has only a left child
-      node.value = node.leftChild.value;
-      node.leftChild = null;
-    } else if (node.rightChild !== null) {
-      // if node has only a right child
-      node.value = node.rightChild.value;
-      node.rightChild = null;
+  removeNode(value) {
+    this._removeNode(this.root, value);
+  }
+  _removeNode(root, value) {
+    if (root === null) {
+      return;
+    }
+    if (root.value > value) {
+      this._removeNode(root.leftChild, value);
+    } else if (root.value < value) {
+      this._removeNode(root.rightChild, value);
     } else {
-      // if node has no childs
-      node = null;
+      if (root.leftChild !== null && root.rightChild !== null) {
+        let n = this.inOrder(root.rightChild)[0];
+        const tmp = n.value;
+        root.id = Math.floor(Math.random() * 100000);
+        root.value = tmp;
+        this._removeNode(n, n.value);
+      } else if (root.leftChild !== null) {
+        root.id = root.leftChild.id;
+        root.value = root.leftChild.value;
+        root.setRightChild(root.leftChild.rightChild);
+        root.setLeftChild(root.leftChild.leftChild);
+      } else if (root.rightChild !== null) {
+        root.id = root.rightChild.id;
+        root.value = root.rightChild.value;
+        root.setLeftChild(root.rightChild.leftChild);
+        root.setRightChild(root.rightChild.rightChild);
+      } else {
+        if (root.onDelete) root.onDelete();
+      }
     }
   }
   inOrder(root) {

@@ -12,8 +12,9 @@
             type="number"
             v-model="val"
           ></v-text-field>
-          <v-btn @click="add">ADD NODE</v-btn>
+          <v-btn @click="add">Add</v-btn>
           <v-btn @click="search">Search</v-btn>
+          <v-btn @click="remove">Remove</v-btn>
           <v-btn @click="clear">CLEAR TREE</v-btn>
           <v-btn @click="exportSVG">EXPORT SVG</v-btn>
         </v-form>
@@ -77,8 +78,9 @@ export default {
     createID() {
       return Math.floor(Math.random() * 100000);
     },
-    remove(node) {
-      this.tree.removeNode(node);
+    remove() {
+      this.tree.removeNode(parseInt(this.val, 10));
+      this.updateView();
     },
     push(value) {
       this.tree.addNode(new TreeNode(this.createID(), value));
@@ -105,36 +107,28 @@ export default {
         stroke: "black",
         shape: "ellipse",
       });
-      const leftId = this.render(x - width, y + 100, width / 2, node.leftChild);
-      if (leftId > 0) {
+      if (this.render(x - width, y + 100, width / 2, node.leftChild) > 0) {
         this.graph.links.push({
           id: this.createID(),
           source: node.id,
-          destination: leftId,
+          destination: node.leftChild.id,
           point: { x: x - width / 2 + 25, y: y + 75 },
           color: "black",
           shape: "straight",
           arrow: "dest",
         });
       }
-      const rightId = this.render(
-        x + width,
-        y + 100,
-        width / 2,
-        node.rightChild
-      );
-      if (rightId > 0) {
+      if (this.render(x + width, y + 100, width / 2, node.rightChild) > 0) {
         this.graph.links.push({
           id: this.createID(),
           source: node.id,
-          destination: rightId,
+          destination: node.rightChild.id,
           point: { x: x + width / 2 + 25, y: y + 75 },
           color: "black",
           shape: "straight",
           arrow: "dest",
         });
       }
-
       return node.id;
     },
     updateView() {
