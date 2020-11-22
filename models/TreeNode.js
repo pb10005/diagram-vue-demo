@@ -1,7 +1,8 @@
 import Nullable from "~/lib/Nullable";
 
 export default class TreeNode {
-  constructor(value) {
+  constructor(id, value) {
+    this.id = id;
     this.value = value;
 
     this.leftChild = null;
@@ -10,7 +11,7 @@ export default class TreeNode {
   }
 
   add(node) {
-    if (node.value <= this.value) {
+    if (node.value < this.value) {
       if (this.leftChild === null) {
         this.leftChild = node;
       } else {
@@ -26,20 +27,21 @@ export default class TreeNode {
   }
 
   search(value) {
-    let found = false;
+    let result = null;
     if (this.value === value) {
-      found = true;
+      this.marked = true;
+      return this;
     } else if (this.value > value) {
-      found = Nullable.of(this.leftChild)
+      result = Nullable.of(this.leftChild)
         .map((x) => x.search(value))
-        .returnOr(false);
+        .returnOr(null);
     } else {
-      found = Nullable.of(this.rightChild)
+      result = Nullable.of(this.rightChild)
         .map((x) => x.search(value))
-        .returnOr(false);
+        .returnOr(null);
     }
-    this.marked = found;
-    return found;
+    this.marked = true;
+    return result;
   }
 
   clearMarked() {

@@ -19,14 +19,15 @@
         </v-form>
         <section class="pa-2 d-flex justify-center">
           <section class="auto-scroll">
-          <Diagram
-            ref="tree"
-            :width="graph.width"
-            :height="graph.height"
-            :background="graph.background"
-            :nodes="graph.nodes"
-            :links="graph.links"
-          />
+            <Diagram
+              ref="tree"
+              :width="graph.width"
+              :height="graph.height"
+              :background="graph.background"
+              :nodes="graph.nodes"
+              :links="graph.links"
+              @nodeClicked="push(23)"
+            />
           </section>
         </section>
       </v-card-text>
@@ -34,6 +35,8 @@
   </v-container>
 </template>
 <script>
+import Nullable from "~/lib/Nullable";
+import BinarySearchTree from "@/models/BinarySearchTree";
 import TreeNode from "@/models/TreeNode";
 import Diagram from "diagram-vue";
 export default {
@@ -44,9 +47,7 @@ export default {
     return {
       id: 0,
       val: 0,
-      tree: {
-        root: null,
-      },
+      tree: new BinarySearchTree(null),
       graph: {
         width: 800,
         height: 600,
@@ -76,29 +77,27 @@ export default {
     createID() {
       return Math.floor(Math.random() * 100000);
     },
+    remove(node) {
+      this.tree.removeNode(node);
+    },
     push(value) {
-      if (this.tree.root === null) {
-        this.tree.root = new TreeNode(value);
-      } else {
-        this.tree.root.add(new TreeNode(value));
-      }
+      this.tree.addNode(new TreeNode(this.createID(), value));
     },
     search() {
       this.clearSearchResult();
       if (this.tree.root !== null) {
         const result = this.tree.root.search(parseInt(this.val, 10));
         this.updateView();
-        alert(result ? "Found" : "Not found");
+        alert(result !== null ? "Found" : "Not found");
       }
     },
     clearSearchResult() {
-      this.tree.root.clearMarked();
+      Nullable.of(this.tree.root).exec((x) => x.clearMarked());
     },
     render(x, y, width, node) {
       if (node === null) return -1;
-      const currentId = ++this.id;
       this.graph.nodes.push({
-        id: currentId,
+        id: node.id,
         content: { text: node.value, color: node.marked ? "pink" : "white" },
         point: { x, y },
         width: 50,
@@ -110,7 +109,7 @@ export default {
       if (leftId > 0) {
         this.graph.links.push({
           id: this.createID(),
-          source: currentId,
+          source: node.id,
           destination: leftId,
           point: { x: x - width / 2 + 25, y: y + 75 },
           color: "black",
@@ -127,7 +126,7 @@ export default {
       if (rightId > 0) {
         this.graph.links.push({
           id: this.createID(),
-          source: currentId,
+          source: node.id,
           destination: rightId,
           point: { x: x + width / 2 + 25, y: y + 75 },
           color: "black",
@@ -136,7 +135,7 @@ export default {
         });
       }
 
-      return currentId;
+      return node.id;
     },
     updateView() {
       this.graph.nodes = [];
@@ -148,7 +147,7 @@ export default {
       this.updateView();
     },
     clear() {
-      this.tree.root = null;
+      this.tree.clear();
       this.updateView();
     },
     exportSVG() {
