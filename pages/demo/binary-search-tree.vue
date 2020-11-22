@@ -89,8 +89,8 @@ export default {
       this.clearSearchResult();
       if (this.tree.root !== null) {
         const result = this.tree.root.search(parseInt(this.val, 10));
-        this.updateView();
         alert(result !== null ? "Found" : "Not found");
+        this.updateView();
       }
     },
     clearSearchResult() {
@@ -98,8 +98,9 @@ export default {
     },
     render(x, y, width, node) {
       if (node === null) return -1;
+      const id = ++this.id;
       this.graph.nodes.push({
-        id: node.id,
+        id: id,
         content: { text: node.value, color: node.marked ? "pink" : "white" },
         point: { x, y },
         width: 50,
@@ -107,29 +108,36 @@ export default {
         stroke: "black",
         shape: "ellipse",
       });
-      if (this.render(x - width, y + 100, width / 2, node.leftChild) > 0) {
+      const leftID = this.render(x - width, y + 100, width / 2, node.leftChild);
+      if (leftID > 0) {
         this.graph.links.push({
           id: this.createID(),
-          source: node.id,
-          destination: node.leftChild.id,
+          source: id,
+          destination: leftID,
           point: { x: x - width / 2 + 25, y: y + 75 },
           color: "black",
           shape: "straight",
           arrow: "dest",
         });
       }
-      if (this.render(x + width, y + 100, width / 2, node.rightChild) > 0) {
+      const rightID = this.render(
+        x + width,
+        y + 100,
+        width / 2,
+        node.rightChild
+      );
+      if (rightID > 0) {
         this.graph.links.push({
           id: this.createID(),
-          source: node.id,
-          destination: node.rightChild.id,
+          source: id,
+          destination: rightID,
           point: { x: x + width / 2 + 25, y: y + 75 },
           color: "black",
           shape: "straight",
           arrow: "dest",
         });
       }
-      return node.id;
+      return id;
     },
     updateView() {
       this.graph.nodes = [];
