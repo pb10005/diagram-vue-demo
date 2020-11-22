@@ -45,8 +45,7 @@ export default class TreeNode {
   search(value) {
     let result = null;
     if (this.value === value) {
-      this.marked = true;
-      return this;
+      result = this;
     } else if (this.value > value) {
       result = Nullable.of(this.leftChild)
         .map((x) => x.search(value))
@@ -56,7 +55,9 @@ export default class TreeNode {
         .map((x) => x.search(value))
         .returnOr(null);
     }
-    this.marked = true;
+    if (result !== null) {
+      this.marked = true;
+    }
     return result;
   }
 
